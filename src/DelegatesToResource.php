@@ -4,7 +4,7 @@
 namespace Goodgod\ApiTransform;
 
 
-use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 trait DelegatesToResource
 {

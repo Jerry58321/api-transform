@@ -5,7 +5,7 @@ namespace Goodgod\ApiTransform;
 
 use Goodgod\ApiTransform\Contracts\OutputDefinition;
 use Goodgod\ApiTransform\Exceptions\NotFoundSpecifiedResource;
-use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\Pure;
