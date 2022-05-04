@@ -59,9 +59,22 @@ class Resources implements ArrayAccess, JsonSerializable
      */
     public function mapExecClosure(): static
     {
-        foreach ($this->resources as $key => $data) {
-            if ($data instanceof \Closure) $data($this, $key);
-        }
+        $refLastKey = function ($resource) {
+            end($resource);
+            return key($resource);
+        };
+        $lastKey = $refLastKey($this->resources);
+
+        do {
+            $currentKey = key($this->resources);
+            $data = current($this->resources);
+            if ($data instanceof \Closure && $data($this, $currentKey) === null) {
+                continue;
+            }
+            $lastKey = $refLastKey($this->resources);
+            next($this->resources);
+        } while (!is_null($currentKey) && $lastKey !== $currentKey);
+
         return $this;
     }
 

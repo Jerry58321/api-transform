@@ -77,6 +77,19 @@ abstract class Transform implements OutputDefinition
     }
 
     /**
+     * @param string $relation
+     * @param \Closure $action
+     * @return mixed
+     */
+    public function whenRelationLoaded(string $relation, \Closure $action): mixed
+    {
+        return fn(Resources $resource, $key) => $resource->offsetSet($key, $this->when(
+            $resource->get()->relationLoaded($relation),
+            $action
+        ));
+    }
+
+    /**
      * @param $key
      * @return mixed
      */
