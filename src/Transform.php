@@ -79,9 +79,9 @@ abstract class Transform implements OutputDefinition
     /**
      * @param string $relation
      * @param \Closure $action
-     * @return mixed
+     * @return \Closure
      */
-    public function whenRelationLoaded(string $relation, \Closure $action): mixed
+    public function whenRelationLoaded(string $relation, \Closure $action): \Closure
     {
         return fn(Resources $resource, $key) => $resource->offsetSet($key, $this->when(
             $resource->get()->relationLoaded($relation),
@@ -160,9 +160,9 @@ abstract class Transform implements OutputDefinition
     /**
      * @param string $methodName
      * @param $resource
-     * @return Resources|array
+     * @return mixed
      */
-    private function getMethodNameFunc(string $methodName, $resource): Resources|array
+    private function getMethodNameFunc(string $methodName, $resource): mixed
     {
         return $this->{'__' . Str::camel($methodName)}($resource);
     }
@@ -188,7 +188,10 @@ abstract class Transform implements OutputDefinition
         foreach ($this->methodOutputKey() as $key => $value) {
             $methodName = is_numeric($key) ? $value : $key;
             $resource = $this->getResourcesByKey($methodName);
-            $transformData = $this->getMethodNameFunc($methodName, $resource);
+
+            $transformData = $resource->mapUnit($resource,
+                fn($data) => $this->getMethodNameFunc($methodName, new Resources($data))
+            );
 
             $callback(
                 $resource,

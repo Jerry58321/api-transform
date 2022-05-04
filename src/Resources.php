@@ -5,6 +5,7 @@ namespace Goodgod\ApiTransform;
 
 
 use ArrayAccess;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use JsonSerializable;
 
@@ -55,15 +56,27 @@ class Resources implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * @param $resource
+     * @param \Closure $callback
+     * @return mixed
+     */
+    public function mapUnit($resource, \Closure $callback): mixed
+    {
+        if (is_numeric_list($resource) || $resource instanceof AbstractPaginator) {
+            return collect($resource)->map(fn ($data) => $callback($data))->toArray();
+        } else {
+            return $callback($resource);
+        }
+    }
+
+    /**
      * @return $this
      */
     public function mapExecClosure(): static
     {
-        $refLastKey = function ($resource) {
-            end($resource);
-            return key($resource);
-        };
-        $lastKey = $refLastKey($this->resources);
+        if (!is_array($this->resources)) return $this;
+
+        $lastKey = $this->getRefLastKey($this->resources);
 
         do {
             $currentKey = key($this->resources);
@@ -71,11 +84,21 @@ class Resources implements ArrayAccess, JsonSerializable
             if ($data instanceof \Closure && $data($this, $currentKey) === null) {
                 continue;
             }
-            $lastKey = $refLastKey($this->resources);
+            $lastKey = $this->getRefLastKey($this->resources);
             next($this->resources);
         } while (!is_null($currentKey) && $lastKey !== $currentKey);
 
         return $this;
+    }
+
+    /**
+     * @param $resource
+     * @return int|string|null
+     */
+    private function getRefLastKey($resource): int|string|null
+    {
+        end($resource);
+        return key($resource);
     }
 
     /**
