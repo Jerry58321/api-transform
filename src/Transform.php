@@ -13,13 +13,13 @@ use JetBrains\PhpStorm\Pure;
 abstract class Transform implements OutputDefinition
 {
     /** @var Resources $resources */
-    private Resources $resources;
+    protected Resources $resources;
 
     /** @var Resources $transform */
     private Resources $transform;
 
     /** @var array $parameters */
-    private array $parameters;
+    protected array $parameters;
 
     /** @var bool $withPaginationOutput */
     private bool $withPaginationOutput = true;
@@ -114,7 +114,7 @@ abstract class Transform implements OutputDefinition
     /**
      * @return JsonResponse
      */
-    private function toResponse(): JsonResponse
+    protected function toResponse(): JsonResponse
     {
         return $this->transform->jsonSerialize();
     }
@@ -122,13 +122,13 @@ abstract class Transform implements OutputDefinition
     /**
      * @return $this
      */
-    private function toTransform(): static
+    protected function toTransform(): static
     {
         $this->eachResource(function (Resources $resources, Resources $data, $key) {
             $data = $data->mapExecClosure()->get();
             $key === false ?
                 $this->transform->push($data, $this->pack) :
-                $this->transform->push([$key => $data], $this->pack);
+                $this->transform->push($data, "{$this->pack}.{$key}");
 
             if ($this->withPaginationOutput && $resources->get() instanceof AbstractPaginator) {
                 $this->withPaginationOutput($key, $resources->get());
@@ -185,11 +185,12 @@ abstract class Transform implements OutputDefinition
      */
     private function eachResource(\Closure $callback): void
     {
+        // Limit $this->methodOutputKey() to define only one false output
         foreach ($this->methodOutputKey() as $key => $value) {
             $methodName = is_numeric($key) ? $value : $key;
             $resource = $this->getResourcesByKey($methodName);
 
-            $transformData = $resource->mapUnit($resource,
+            $transformData = $resource->mapUnit($resource->get(),
                 fn($data) => $this->getMethodNameFunc($methodName, new Resources($data))
             );
 
