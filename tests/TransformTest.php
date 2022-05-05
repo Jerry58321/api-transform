@@ -1,9 +1,11 @@
 <?php
 
 use transform\ExampleTransform;
-use Goodgod\ApiTransform\Transform;
+use transform\ExampleTest;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Goodgod\ApiTransform\Transform;
+use Goodgod\ApiTransform\Resources;
 
 class TransformTest extends TestCase
 {
@@ -24,10 +26,10 @@ class TransformTest extends TestCase
         $this->assertSame($result, $content['data'] ?? []);
     }
 
-    private function setTransformDataFromKey(Transform $transform, array $transformData, array $keyNames): void
+    private function setTransformDataFromKey(ExampleTest $transform, array $transformData, array $keyNames): void
     {
         foreach ($transformData as $key => $data) {
-            $transform->{$keyNames[$key]} = $data;
+            $transform->setAttribute($keyNames[$key], $data);
         }
     }
 
@@ -43,7 +45,7 @@ class TransformTest extends TestCase
     protected function verifyOutputSameResources($keyNames): array
     {
         [$firstKey] = $keyNames;
-        $resource = [
+        $input = [
             [
                 'name'  => 'John',
                 'age'   => '20',
@@ -56,34 +58,34 @@ class TransformTest extends TestCase
         ];
         return [
             [$firstKey => Str::camel($firstKey)],
-            [$firstKey => $resource],
+            [$firstKey => $input],
             [
-                fn($resources) => [
+                fn(Transform $transform, Resources $resources) => [
                     'name'  => $resources->name,
                     'age'   => $resources->age,
                     'level' => $resources->level,
                 ]
             ],
-            [Str::camel($firstKey) => $resource]
+            [Str::camel($firstKey) => $input]
         ];
     }
 
     protected function verifyTwoResources($keyNames): array
     {
         [$firstKey, $secondKey] = $keyNames;
-        $resource = [$firstKey => ['output' => 'first'], $secondKey => ['output' => 'second']];
+        $input = [$firstKey => ['output' => 'first'], $secondKey => ['output' => 'second']];
         return [
             [$firstKey => $firstKey, $secondKey => $secondKey],
-            $resource,
+            $input,
             [
-                fn($resources) => [
-                    'output' => $resources->output,
+                fn(Transform $transform, Resources $resources) => [
+                    'output' => $transform->when(true, fn () => $resources->output),
                 ],
-                fn($resources) => [
+                fn(Transform $transform, Resources $resources) => [
                     'output' => $resources->output,
                 ]
             ],
-            $resource
+            $input
         ];
     }
 }
