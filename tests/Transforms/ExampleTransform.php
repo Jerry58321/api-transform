@@ -1,15 +1,16 @@
 <?php
 
 
-namespace transform;
+namespace Transforms;
 
 
+use Contracts\TestTransform;
 use Goodgod\ApiTransform\Transform;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\MockObject\BadMethodCallException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ExampleTransform extends Transform implements ExampleTest
+class ExampleTransform extends Transform implements TestTransform
 {
     public array $methodOutputKey = [];
 
@@ -18,17 +19,22 @@ class ExampleTransform extends Transform implements ExampleTest
         'secondKey',
     ];
 
-    private array $attributes;
+    private array $keyMethods;
 
     public function methodOutputKey(): array
     {
         return $this->methodOutputKey;
     }
 
-    public function setAttribute($name, $value): static
+    public function setKeyMethods($name, $value): static
     {
-        $this->attributes[$name] = $value;
+        $this->keyMethods[$name] = $value;
         return $this;
+    }
+
+    public function getKeyMethods($name): \Closure
+    {
+        return $this->keyMethods[$name];
     }
 
     public function mockResponse(): JsonResponse
@@ -42,7 +48,7 @@ class ExampleTransform extends Transform implements ExampleTest
     {
         foreach ($this::$keyNames as $keyName) {
             if ($name === '__' . Str::camel($keyName)) {
-                return call_user_func($this->attributes[$keyName], $this, ...$arguments);
+                return call_user_func($this->getKeyMethods($keyName), $this, ...$arguments);
             }
         }
 

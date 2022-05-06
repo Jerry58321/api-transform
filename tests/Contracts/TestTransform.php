@@ -1,14 +1,16 @@
 <?php
 
 
-namespace transform;
+namespace Contracts;
 
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-interface ExampleTest
+interface TestTransform
 {
-    public function setAttribute($name, $value): static;
+    public function setKeyMethods($name, $value): static;
+
+    public function getKeyMethods($name): \Closure;
 
     public function mockResponse(): JsonResponse;
 

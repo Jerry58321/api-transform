@@ -5,6 +5,7 @@ namespace Goodgod\ApiTransform;
 
 use Goodgod\ApiTransform\Contracts\OutputDefinition;
 use Goodgod\ApiTransform\Exceptions\NotFoundSpecifiedResource;
+use Goodgod\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Str;
@@ -124,8 +125,9 @@ abstract class Transform implements OutputDefinition
      */
     protected function toTransform(): static
     {
-        $this->eachResource(function (Resources $resources, Resources $data, $key) {
-            $data = $data->mapExecClosure()->get();
+        $this->checkIsOnlyOneFalseKey();
+
+        $this->eachResource(function (Resources $resources, $data, $key) {
             $key === false ?
                 $this->transform->push($data, $this->pack) :
                 $this->transform->push($data, "{$this->pack}.{$key}");
@@ -162,9 +164,10 @@ abstract class Transform implements OutputDefinition
      * @param $resource
      * @return mixed
      */
-    private function getMethodNameFunc(string $methodName, $resource): mixed
+    private function getMethodNameFunc(string $methodName, $resource): Resources
     {
-        return $this->{'__' . Str::camel($methodName)}($resource);
+        $resolve = $this->{'__' . Str::camel($methodName)}($resource);
+        return $resolve instanceof Resources ? $resolve : new Resources($resolve);
     }
 
     /**
@@ -185,20 +188,27 @@ abstract class Transform implements OutputDefinition
      */
     private function eachResource(\Closure $callback): void
     {
-        // Limit $this->methodOutputKey() to define only one false output
         foreach ($this->methodOutputKey() as $key => $value) {
             $methodName = is_numeric($key) ? $value : $key;
             $resource = $this->getResourcesByKey($methodName);
 
-            $transformData = $resource->mapUnit($resource->get(),
+            $data = $resource->mapUnit($resource->get(),
                 fn($data) => $this->getMethodNameFunc($methodName, new Resources($data))
+                    ->mapExecClosure()
+                    ->get()
             );
 
             $callback(
                 $resource,
-                $transformData instanceof Resources ? $transformData : new Resources($transformData),
+                $data,
                 $value
             );
         }
+    }
+
+    private function checkIsOnlyOneFalseKey(): void
+    {
+        $falseKeyCount = collect($this->methodOutputKey())->intersect(false)->count();
+        if ($falseKeyCount > 1) throw new OnlyOneFalseKey("methodOutputKey defines {$falseKeyCount} False Key");
     }
 }
