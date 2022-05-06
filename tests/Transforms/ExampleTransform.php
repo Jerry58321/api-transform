@@ -5,6 +5,7 @@ namespace Transforms;
 
 
 use Contracts\TestTransform;
+use Goodgod\ApiTransform\Resources;
 use Goodgod\ApiTransform\Transform;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\MockObject\BadMethodCallException;
@@ -14,7 +15,7 @@ class ExampleTransform extends Transform implements TestTransform
 {
     public array $methodOutputKey = [];
 
-    public static array $keyNames = [
+    private static array $keyNames = [
         'firstKey',
         'secondKey',
     ];
@@ -24,6 +25,11 @@ class ExampleTransform extends Transform implements TestTransform
     public function methodOutputKey(): array
     {
         return $this->methodOutputKey;
+    }
+
+    public static function getKeyNames(): array
+    {
+        return self::$keyNames;
     }
 
     public function setKeyMethods($name, $value): static

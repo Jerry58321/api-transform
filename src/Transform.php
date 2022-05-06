@@ -198,17 +198,13 @@ abstract class Transform implements OutputDefinition
                     ->get()
             );
 
-            $callback(
-                $resource,
-                $data,
-                $value
-            );
+            $callback($resource, $data, $value);
         }
     }
 
     private function checkIsOnlyOneFalseKey(): void
     {
-        $falseKeyCount = collect($this->methodOutputKey())->intersect(false)->count();
+        $falseKeyCount = collect($this->methodOutputKey())->intersect([false])->count();
         if ($falseKeyCount > 1) throw new OnlyOneFalseKey("methodOutputKey defines {$falseKeyCount} False Key");
     }
 }

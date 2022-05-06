@@ -8,19 +8,13 @@ use Goodgod\ApiTransform\Resources;
 use Goodgod\ApiTransform\Transform;
 use Illuminate\Support\Str;
 
-class SuccessDataProvider
+class SuccessDataProvider extends DataProvider
 {
-    private array $keyNames;
-
-    public function __construct(array $keyNames)
-    {
-        $this->keyNames = $keyNames;
-    }
-
     public function getVerifications(): array
     {
         return array_merge(
             $this->verifyOutputSameResources(),
+            $this->verifyStringResources(),
             $this->verifyTwoResources(),
             $this->verifyFalseOutputKey(),
             $this->verifyWhenMethod(),
@@ -53,6 +47,23 @@ class SuccessDataProvider
                     ]
                 ],
                 [Str::camel($firstKey) => $input]
+            ]
+        ];
+    }
+
+    protected function verifyStringResources()
+    {
+        [$firstKey] = $this->keyNames;
+        return [
+            __FUNCTION__ => [
+                [$firstKey => $firstKey],
+                [$firstKey => 'test'],
+                [
+                    fn(Transform $transform, Resources $resources) => $resources
+                ],
+                [
+                    $firstKey => 'test'
+                ]
             ]
         ];
     }
