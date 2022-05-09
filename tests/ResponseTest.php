@@ -1,29 +1,25 @@
 <?php
 
-use Transforms\ExampleTransform;
 use Contracts\TestTransform;
-use PHPUnit\Framework\TestCase;
 use Data\SuccessDataProvider;
 use Goodgod\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Data\FailDataProvider;
 
-class ResponseTest extends TestCase
+class ResponseTest extends BaseTest
 {
-    private string $transform = ExampleTransform::class;
-
     /**
      * @dataProvider successDataProvider
-     * @param $resource
+     * @param $resources
      * @param array $methodOutputKey
      * @param array $transformData
      * @param $result
      */
-    public function testSuccess(array $methodOutputKey, $resource, array $transformData, $result)
+    public function testSuccess(array $methodOutputKey, $resources, array $transformData, $result)
     {
         /** @var TestTransform $transform */
-        $transform = new $this->transform($resource);
+        $transform = new $this->transform($resources);
         $transform->methodOutputKey = $methodOutputKey;
-        $this->setTransformDataFromKey($transform, $transformData, $transform::getKeyNames());
+        $this->setTransformDataFromKey($transform, $transformData, $this->getTransformKeyNames());
         $content = json_decode($transform->mockResponse()->getContent(), true);
 
         $this->assertSame($result, $content['data'] ?? []);
@@ -32,42 +28,36 @@ class ResponseTest extends TestCase
     /**
      * @dataProvider failOnlyOneFalseKeyDataProvider
      * @param array $methodOutputKey
-     * @param $resource
+     * @param $resources
      * @param array $transformData
      * @param $result
      */
-    public function testOnlyOneFalseKey(array $methodOutputKey, $resource, array $transformData, $result)
+    public function testOnlyOneFalseKey(array $methodOutputKey, $resources, array $transformData, $result)
     {
         $this->expectException(OnlyOneFalseKey::class);
 
         /** @var TestTransform $transform */
-        $transform = new $this->transform($resource);
+        $transform = new $this->transform($resources);
         $transform->methodOutputKey = $methodOutputKey;
-        $this->setTransformDataFromKey($transform, $transformData, $transform::getKeyNames());
+        $this->setTransformDataFromKey($transform, $transformData, $transform->getKeyNames());
         $transform->mockResponse();
     }
 
+    /**
+     * @return array
+     */
     public function successDataProvider(): array
     {
         $provider = new SuccessDataProvider($this->getTransformKeyNames());
         return $provider->getVerifications();
     }
 
-    public function failOnlyOneFalseKeyDataProvider()
+    /**
+     * @return array
+     */
+    public function failOnlyOneFalseKeyDataProvider(): array
     {
         $provider = new FailDataProvider($this->getTransformKeyNames());
         return $provider->onlyFunc(['verifyOnlyOneFalseKey']);
-    }
-
-    private function setTransformDataFromKey(TestTransform $transform, array $transformData, array $keyNames): void
-    {
-        foreach ($transformData as $key => $data) {
-            $transform->setKeyMethods($keyNames[$key], $data);
-        }
-    }
-
-    private function getTransformKeyNames(): array
-    {
-        return call_user_func([$this->transform, 'getKeyNames']);
     }
 }

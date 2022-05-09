@@ -19,7 +19,9 @@
     <filter>
         <whitelist>
             <directory>./src/</directory>
-            <directory>./tests/transform/</directory>
+            <directory>./tests/Transforms/</directory>
+            <directory>./tests/Contracts/</directory>
+            <directory>./tests/Mock/</directory>
         </whitelist>
     </filter>
 </phpunit>

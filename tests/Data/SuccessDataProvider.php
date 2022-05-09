@@ -144,4 +144,25 @@ class SuccessDataProvider extends DataProvider
             ]
         ];
     }
+
+    protected function verifyWhenRelationLoaded()
+    {
+        $input = ['name' => 'John', 'age' => 19];
+
+        return [
+            __FUNCTION__ => [
+                [],
+                $input,
+                [
+                    fn(Transform $transform, Resources $resources) => [
+                        'name' => $transform->whenRelationLoaded('user', fn() => $resources->name . '_prefix'),
+                        'age'  => $transform->whenRelationLoaded('none', fn() => $resources->age)
+                    ]
+                ],
+                [
+                    'name' => $input['name'] . '_prefix'
+                ]
+            ]
+        ];
+    }
 }
