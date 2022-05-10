@@ -1,11 +1,11 @@
 <?php
 
 
-namespace ezp\ApiTransform;
+namespace jerry58321\ApiTransform;
 
-use ezp\ApiTransform\Contracts\OutputDefinition;
-use ezp\ApiTransform\Exceptions\NotFoundSpecifiedResource;
-use ezp\ApiTransform\Exceptions\OnlyOneFalseKey;
+use jerry58321\ApiTransform\Contracts\OutputDefinition;
+use jerry58321\ApiTransform\Exceptions\NotFoundSpecifiedResource;
+use jerry58321\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Str;

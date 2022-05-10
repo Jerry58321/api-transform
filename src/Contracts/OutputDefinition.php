@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ezp\ApiTransform\Contracts;
+namespace jerry58321\ApiTransform\Contracts;
 
 
 interface OutputDefinition

@@ -5,8 +5,8 @@ namespace Transforms;
 
 
 use Contracts\TestTransform;
-use ezp\ApiTransform\Resources;
-use ezp\ApiTransform\Transform;
+use jerry58321\ApiTransform\Resources;
+use jerry58321\ApiTransform\Transform;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\MockObject\BadMethodCallException;
 use Symfony\Component\HttpFoundation\JsonResponse;
