@@ -4,8 +4,8 @@
 namespace Data;
 
 
-use Goodgod\ApiTransform\Resources;
-use Goodgod\ApiTransform\Transform;
+use ezp\ApiTransform\Resources;
+use ezp\ApiTransform\Transform;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 

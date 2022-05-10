@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Goodgod\ApiTransform;
+namespace ezp\ApiTransform;
 
 
 use Symfony\Component\HttpFoundation\JsonResponse;

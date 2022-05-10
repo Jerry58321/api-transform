@@ -1,0 +1,25 @@
+<?php
+
+namespace {{ namespace }};
+
+use ezp\ApiTransform\Transform;
+use ezp\ApiTransform\Resources;
+
+class {{ class }} extends Transform
+{
+    public function methodOutputKey(): array
+    {
+        return [
+            'user' => false
+        ];
+    }
+
+    public function __user(Resources $resource)
+    {
+        return [
+            'account'  => $resource->account,
+            'name'     => $resource->name,
+            'birthday' => $resource->birthday,
+        ];
+    }
+}

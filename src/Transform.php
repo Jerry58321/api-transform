@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Goodgod\ApiTransform;
+namespace ezp\ApiTransform;
 
-use Goodgod\ApiTransform\Contracts\OutputDefinition;
-use Goodgod\ApiTransform\Exceptions\NotFoundSpecifiedResource;
-use Goodgod\ApiTransform\Exceptions\OnlyOneFalseKey;
+use ezp\ApiTransform\Contracts\OutputDefinition;
+use ezp\ApiTransform\Exceptions\NotFoundSpecifiedResource;
+use ezp\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Str;

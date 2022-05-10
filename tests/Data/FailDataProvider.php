@@ -4,8 +4,8 @@
 namespace Data;
 
 
-use Goodgod\ApiTransform\Resources;
-use Goodgod\ApiTransform\Transform;
+use ezp\ApiTransform\Resources;
+use ezp\ApiTransform\Transform;
 
 class FailDataProvider extends DataProvider
 {
