@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Goodgod\ApiTransform\Contracts;
+namespace ezp\ApiTransform\Contracts;
 
 
 interface OutputDefinition

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Goodgod\ApiTransform\Exceptions;
+namespace ezp\ApiTransform\Exceptions;
 
 
 use Throwable;
