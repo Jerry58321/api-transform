@@ -4,12 +4,26 @@
 namespace Mock;
 
 use Goodgod\ApiTransform\Resources;
-use Illuminate\Support\Collection;
 
-class Model extends Resources
+class Model extends Resources implements \IteratorAggregate
 {
-    public function relationLoaded(): bool
+    public function get(): mixed
     {
-        return true;
+        return $this;
+    }
+
+    public function getItems()
+    {
+        return $this->resources;
+    }
+
+    public function relationLoaded(string $relation): bool
+    {
+        return $relation === 'user';
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->resources);
     }
 }
