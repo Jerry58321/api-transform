@@ -1,6 +1,6 @@
 <?php
 
-namespace ezp\ApiTransform\Commands;
+namespace jerry58321\ApiTransform\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;

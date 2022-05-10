@@ -2,7 +2,7 @@
 
 use Contracts\TestTransform;
 use Data\SuccessDataProvider;
-use ezp\ApiTransform\Exceptions\OnlyOneFalseKey;
+use jerry58321\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Data\FailDataProvider;
 
 class ResponseTest extends BaseTest

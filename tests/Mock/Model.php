@@ -3,7 +3,7 @@
 
 namespace Mock;
 
-use ezp\ApiTransform\Resources;
+use jerry58321\ApiTransform\Resources;
 
 class Model extends Resources implements \IteratorAggregate
 {

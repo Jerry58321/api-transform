@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ezp\ApiTransform;
+namespace jerry58321\ApiTransform;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;

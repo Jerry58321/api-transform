@@ -2,8 +2,8 @@
 
 namespace {{ namespace }};
 
-use ezp\ApiTransform\Transform;
-use ezp\ApiTransform\Resources;
+use jerry58321\ApiTransform\Transform;
+use jerry58321\ApiTransform\Resources;
 
 class {{ class }} extends Transform
 {

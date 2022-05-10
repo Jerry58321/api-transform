@@ -1,6 +1,6 @@
 <?php
 
-use ezp\ApiTransform\Resources;
+use jerry58321\ApiTransform\Resources;
 use Mock\Model;
 use Data\SuccessDataProvider;
 

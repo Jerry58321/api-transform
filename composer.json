@@ -1,12 +1,12 @@
 {
-    "name": "ezp/api-transform",
+    "name": "jerry58321/api-transform",
     "description": "is a api transformation layer",
     "keywords": ["laravel", "api", "transform"],
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "ezp\\ApiTransform\\": "src/"
+            "jerry58321\\ApiTransform\\": "src/"
         },
         "files": [
             "src/helpers.php"
@@ -25,7 +25,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ezp\\ApiTransform\\TransformServiceProvider"
+                "jerry58321\\ApiTransform\\TransformServiceProvider"
             ]
         }
     },
