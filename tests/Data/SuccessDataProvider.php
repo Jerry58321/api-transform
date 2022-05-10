@@ -6,22 +6,15 @@ namespace Data;
 
 use Goodgod\ApiTransform\Resources;
 use Goodgod\ApiTransform\Transform;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 
 class SuccessDataProvider extends DataProvider
 {
-    public function getVerifications(): array
-    {
-        return array_merge(
-            $this->verifyOutputSameResources(),
-            $this->verifyStringResources(),
-            $this->verifyTwoResources(),
-            $this->verifyFalseOutputKey(),
-            $this->verifyWhenMethod(),
-        );
-    }
-
-    protected function verifyOutputSameResources(): array
+    /**
+     * @return array[]
+     */
+    public function verifyOutputSameResources(): array
     {
         [$firstKey] = $this->keyNames;
         $input = [
@@ -51,7 +44,10 @@ class SuccessDataProvider extends DataProvider
         ];
     }
 
-    protected function verifyStringResources()
+    /**
+     * @return array[]
+     */
+    public function verifyStringResources(): array
     {
         [$firstKey] = $this->keyNames;
         return [
@@ -68,7 +64,10 @@ class SuccessDataProvider extends DataProvider
         ];
     }
 
-    protected function verifyTwoResources(): array
+    /**
+     * @return array[]
+     */
+    public function verifyTwoResources(): array
     {
         [$firstKey, $secondKey] = $this->keyNames;
         $input = [$firstKey => ['output' => 'first'], $secondKey => ['output' => 'second']];
@@ -89,7 +88,10 @@ class SuccessDataProvider extends DataProvider
         ];
     }
 
-    protected function verifyFalseOutputKey(): array
+    /**
+     * @return array[]
+     */
+    public function verifyFalseOutputKey(): array
     {
         [$firstKey, $secondKey] = $this->keyNames;
         $input = [$firstKey => ['output' => 'first'], $secondKey => ['output' => 'second']];
@@ -113,7 +115,10 @@ class SuccessDataProvider extends DataProvider
         ];
     }
 
-    protected function verifyWhenMethod()
+    /**
+     * @return array[]
+     */
+    public function verifyWhenMethod(): array
     {
         [$firstKey] = $this->keyNames;
         $input = [
@@ -145,9 +150,68 @@ class SuccessDataProvider extends DataProvider
         ];
     }
 
-    protected function verifyWhenRelationLoaded()
+    /**
+     * @return array[]
+     */
+    public function verifyWithPagination(): array
     {
-        $input = ['name' => 'John', 'age' => 19];
+        [$firstKey, $secondKey] = $this->keyNames;
+        $input = [
+            $firstKey => new LengthAwarePaginator([
+                ['name' => 'John', 'age' => 20],
+                ['name' => 'Mike', 'age' => 16],
+                ['name' => 'Max', 'age' => 12]
+            ], 3, 2),
+            $secondKey => [
+                ['nickname' => 'J'],
+                ['nickname' => 'M'],
+                ['nickname' => 'M'],
+            ]
+        ];
+
+        return [
+            __FUNCTION__ => [
+                [$firstKey => $firstKey, $secondKey => $secondKey],
+                $input,
+                [
+                    fn(Transform $transform, Resources $resources) => [
+                        'name' => $resources->name,
+                        'age'  => $resources->age,
+                    ],
+                    fn(Transform $transform, Resources $resources) => [
+                        'nickname' => $resources->nickname,
+                    ]
+                ],
+                [
+                    $firstKey => [
+                        'data' => [
+                            ['name' => 'John', 'age' => 20],
+                            ['name' => 'Mike', 'age' => 16],
+                            ['name' => 'Max', 'age' => 12]
+                        ],
+                        'meta' => [
+                            'current_page' => 1,
+                            'last_page'    => 2,
+                            'per_page'     => 2,
+                            'total'        => 3
+                        ]
+                    ],
+                    $secondKey => [
+                        ['nickname' => 'J'],
+                        ['nickname' => 'M'],
+                        ['nickname' => 'M'],
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function verifyWhenRelationLoaded()
+    {
+        $input = ['name' => 'John', 'age' => 19, 'nickname' => 'J'];
 
         return [
             __FUNCTION__ => [
@@ -155,12 +219,14 @@ class SuccessDataProvider extends DataProvider
                 $input,
                 [
                     fn(Transform $transform, Resources $resources) => [
-                        'name' => $transform->whenRelationLoaded('user', fn() => $resources->name . '_prefix'),
-                        'age'  => $transform->whenRelationLoaded('none', fn() => $resources->age)
+                        'name'     => $transform->whenRelationLoaded('user', fn() => $resources->name . '_prefix'),
+                        'age'      => $transform->whenRelationLoaded('none', fn() => $resources->age),
+                        'nickname' => $transform->whenRelationLoaded('user', fn() => $resources->nickname),
                     ]
                 ],
                 [
-                    'name' => $input['name'] . '_prefix'
+                    'name'     => $input['name'] . '_prefix',
+                    'nickname' => $input['nickname'],
                 ]
             ]
         ];

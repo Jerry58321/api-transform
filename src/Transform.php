@@ -128,13 +128,9 @@ abstract class Transform implements OutputDefinition
         $this->checkIsOnlyOneFalseKey();
 
         $this->eachResource(function (Resources $resources, $data, $key) {
-            $key === false ?
-                $this->transform->push($data, $this->pack) :
-                $this->transform->push($data, "{$this->pack}.{$key}");
-
-            if ($this->withPaginationOutput && $resources->get() instanceof AbstractPaginator) {
-                $this->withPaginationOutput($key, $resources->get());
-            }
+            $this->withPaginationOutput && $resources->get() instanceof AbstractPaginator ?
+                $this->packOutputKeyWithPagination($key, $data, $resources->get()) :
+                $this->packOutputKey($key, $data);
         });
 
         return $this;
@@ -145,16 +141,31 @@ abstract class Transform implements OutputDefinition
      * @param $data
      * @return $this
      */
-    private function withPaginationOutput($key, $data): static
+    private function packOutputKey($key, $data): static
     {
-        $this->transform[$key] = [
-            'meta' => [
-                'current_page' => $data->currentPage(),
-                'last_page'    => $data->lastPage(),
-                'per_page'     => $data->perPage(),
-                'total'        => $data->total()
-            ]
-        ];
+        $key === false ?
+            $this->transform->push($data, $this->pack) :
+            $this->transform->push($data, "{$this->pack}.{$key}");
+
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @param $data
+     * @param AbstractPaginator $paginator
+     * @return $this
+     */
+    private function packOutputKeyWithPagination($key, $data, AbstractPaginator $paginator): static
+    {
+        $this->transform->push($data, "{$this->pack}.{$key}.{$this->pack}");
+
+        $this->transform->push([
+            'current_page' => $paginator->currentPage(),
+            'last_page'    => $paginator->lastPage(),
+            'per_page'     => $paginator->perPage(),
+            'total'        => $paginator->total()
+        ], "{$this->pack}.{$key}.meta");
 
         return $this;
     }

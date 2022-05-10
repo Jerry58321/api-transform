@@ -49,7 +49,15 @@ class ResponseTest extends BaseTest
     public function successDataProvider(): array
     {
         $provider = new SuccessDataProvider($this->getTransformKeyNames());
-        return $provider->getVerifications();
+
+        return array_merge(
+            $provider->verifyOutputSameResources(),
+            $provider->verifyStringResources(),
+            $provider->verifyTwoResources(),
+            $provider->verifyFalseOutputKey(),
+            $provider->verifyWhenMethod(),
+            $provider->verifyWithPagination()
+        );
     }
 
     /**
@@ -58,6 +66,6 @@ class ResponseTest extends BaseTest
     public function failOnlyOneFalseKeyDataProvider(): array
     {
         $provider = new FailDataProvider($this->getTransformKeyNames());
-        return $provider->onlyFunc(['verifyOnlyOneFalseKey']);
+        return $provider->verifyOnlyOneFalseKey();
     }
 }

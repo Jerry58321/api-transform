@@ -63,7 +63,9 @@ class Resources implements ArrayAccess, JsonSerializable
      */
     public function mapUnit($resource, \Closure $callback): mixed
     {
-        if ($resource instanceof Collection || is_numeric_list($resource) || $resource instanceof AbstractPaginator) {
+        if ($resource instanceof Collection || $resource instanceof AbstractPaginator) {
+            return $resource->map(fn ($data) => $callback($data))->toArray();
+        } else if (is_numeric_list($resource)) {
             return collect($resource)->map(fn ($data) => $callback($data))->toArray();
         } else {
             return $callback($resource);

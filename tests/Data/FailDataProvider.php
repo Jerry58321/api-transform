@@ -6,17 +6,9 @@ namespace Data;
 
 use Goodgod\ApiTransform\Resources;
 use Goodgod\ApiTransform\Transform;
-use Illuminate\Support\Str;
 
 class FailDataProvider extends DataProvider
 {
-    public function getVerifications(): array
-    {
-        return [
-            $this->verifyOnlyOneFalseKey(),
-        ];
-    }
-
     public function verifyOnlyOneFalseKey(): array
     {
         [$firstKey, $secondKey] = $this->keyNames;
