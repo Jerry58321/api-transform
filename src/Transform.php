@@ -5,6 +5,7 @@ namespace Goodgod\ApiTransform;
 
 use Goodgod\ApiTransform\Contracts\OutputDefinition;
 use Goodgod\ApiTransform\Exceptions\NotFoundSpecifiedResource;
+use Goodgod\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Str;
@@ -13,13 +14,13 @@ use JetBrains\PhpStorm\Pure;
 abstract class Transform implements OutputDefinition
 {
     /** @var Resources $resources */
-    private Resources $resources;
+    protected Resources $resources;
 
     /** @var Resources $transform */
     private Resources $transform;
 
     /** @var array $parameters */
-    private array $parameters;
+    protected array $parameters;
 
     /** @var bool $withPaginationOutput */
     private bool $withPaginationOutput = true;
@@ -114,7 +115,7 @@ abstract class Transform implements OutputDefinition
     /**
      * @return JsonResponse
      */
-    private function toResponse(): JsonResponse
+    protected function toResponse(): JsonResponse
     {
         return $this->transform->jsonSerialize();
     }
@@ -122,17 +123,14 @@ abstract class Transform implements OutputDefinition
     /**
      * @return $this
      */
-    private function toTransform(): static
+    protected function toTransform(): static
     {
-        $this->eachResource(function (Resources $resources, Resources $data, $key) {
-            $data = $data->mapExecClosure()->get();
-            $key === false ?
-                $this->transform->push($data, $this->pack) :
-                $this->transform->push([$key => $data], $this->pack);
+        $this->checkIsOnlyOneFalseKey();
 
-            if ($this->withPaginationOutput && $resources->get() instanceof AbstractPaginator) {
-                $this->withPaginationOutput($key, $resources->get());
-            }
+        $this->eachResource(function (Resources $resources, $data, $key) {
+            $this->withPaginationOutput && $resources->get() instanceof AbstractPaginator ?
+                $this->packOutputKeyWithPagination($key, $data, $resources->get()) :
+                $this->packOutputKey($key, $data);
         });
 
         return $this;
@@ -143,16 +141,31 @@ abstract class Transform implements OutputDefinition
      * @param $data
      * @return $this
      */
-    private function withPaginationOutput($key, $data): static
+    private function packOutputKey($key, $data): static
     {
-        $this->transform[$key] = [
-            'meta' => [
-                'current_page' => $data->currentPage(),
-                'last_page'    => $data->lastPage(),
-                'per_page'     => $data->perPage(),
-                'total'        => $data->total()
-            ]
-        ];
+        $key === false ?
+            $this->transform->push($data, $this->pack) :
+            $this->transform->push($data, "{$this->pack}.{$key}");
+
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @param $data
+     * @param AbstractPaginator $paginator
+     * @return $this
+     */
+    private function packOutputKeyWithPagination($key, $data, AbstractPaginator $paginator): static
+    {
+        $this->transform->push($data, "{$this->pack}.{$key}.{$this->pack}");
+
+        $this->transform->push([
+            'current_page' => $paginator->currentPage(),
+            'last_page'    => $paginator->lastPage(),
+            'per_page'     => $paginator->perPage(),
+            'total'        => $paginator->total()
+        ], "{$this->pack}.{$key}.meta");
 
         return $this;
     }
@@ -162,9 +175,10 @@ abstract class Transform implements OutputDefinition
      * @param $resource
      * @return mixed
      */
-    private function getMethodNameFunc(string $methodName, $resource): mixed
+    private function getMethodNameFunc(string $methodName, $resource): Resources
     {
-        return $this->{'__' . Str::camel($methodName)}($resource);
+        $resolve = $this->{'__' . Str::camel($methodName)}($resource);
+        return $resolve instanceof Resources ? $resolve : new Resources($resolve);
     }
 
     /**
@@ -189,15 +203,19 @@ abstract class Transform implements OutputDefinition
             $methodName = is_numeric($key) ? $value : $key;
             $resource = $this->getResourcesByKey($methodName);
 
-            $transformData = $resource->mapUnit($resource,
+            $data = $resource->mapUnit($resource->get(),
                 fn($data) => $this->getMethodNameFunc($methodName, new Resources($data))
+                    ->mapExecClosure()
+                    ->get()
             );
 
-            $callback(
-                $resource,
-                $transformData instanceof Resources ? $transformData : new Resources($transformData),
-                $value
-            );
+            $callback($resource, $data, $value);
         }
+    }
+
+    private function checkIsOnlyOneFalseKey(): void
+    {
+        $falseKeyCount = collect($this->methodOutputKey())->intersect([false])->count();
+        if ($falseKeyCount > 1) throw new OnlyOneFalseKey("methodOutputKey defines {$falseKeyCount} False Key");
     }
 }

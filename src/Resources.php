@@ -7,6 +7,7 @@ namespace Goodgod\ApiTransform;
 use ArrayAccess;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use JsonSerializable;
 
 class Resources implements ArrayAccess, JsonSerializable
@@ -62,7 +63,9 @@ class Resources implements ArrayAccess, JsonSerializable
      */
     public function mapUnit($resource, \Closure $callback): mixed
     {
-        if (is_numeric_list($resource) || $resource instanceof AbstractPaginator) {
+        if ($resource instanceof Collection || $resource instanceof AbstractPaginator) {
+            return $resource->map(fn ($data) => $callback($data))->toArray();
+        } else if (is_numeric_list($resource)) {
             return collect($resource)->map(fn ($data) => $callback($data))->toArray();
         } else {
             return $callback($resource);
