@@ -17,16 +17,16 @@ abstract class Transform implements OutputDefinition
     protected Resources $resources;
 
     /** @var Resources $transform */
-    private Resources $transform;
+    protected Resources $transform;
 
     /** @var array $parameters */
     protected array $parameters;
 
     /** @var bool $withPaginationOutput */
-    private bool $withPaginationOutput = true;
+    protected bool $withPaginationOutput = true;
 
     /** @var string $pack */
-    private string $pack = 'data';
+    protected string $pack = 'data';
 
     /**
      * Transform constructor.
@@ -144,8 +144,8 @@ abstract class Transform implements OutputDefinition
     private function packOutputKey($key, $data): static
     {
         $key === false ?
-            $this->transform->push($data, $this->pack) :
-            $this->transform->push($data, "{$this->pack}.{$key}");
+            $this->transform->offsetSet($this->pack, $data) :
+            $this->transform->deepSet($data, "{$this->pack}.{$key}");
 
         return $this;
     }
@@ -158,9 +158,9 @@ abstract class Transform implements OutputDefinition
      */
     private function packOutputKeyWithPagination($key, $data, AbstractPaginator $paginator): static
     {
-        $this->transform->push($data, "{$this->pack}.{$key}.{$this->pack}");
+        $this->transform->deepSet($data, "{$this->pack}.{$key}.{$this->pack}");
 
-        $this->transform->push([
+        $this->transform->deepSet([
             'current_page' => $paginator->currentPage(),
             'last_page'    => $paginator->lastPage(),
             'per_page'     => $paginator->perPage(),
@@ -216,6 +216,6 @@ abstract class Transform implements OutputDefinition
     private function checkIsOnlyOneFalseKey(): void
     {
         $falseKeyCount = collect($this->methodOutputKey())->intersect([false])->count();
-        if ($falseKeyCount > 1) throw new OnlyOneFalseKey("methodOutputKey defines {$falseKeyCount} False Key");
+        if ($falseKeyCount > 1) throw new OnlyOneFalseKey("methodOutputKey can only have 1 False Key, {$falseKeyCount} are defined");
     }
 }

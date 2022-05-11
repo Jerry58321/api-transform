@@ -32,16 +32,12 @@ class Resources implements ArrayAccess, JsonSerializable
 
     /**
      * @param $data
-     * @param string|null $deep
+     * @param string $deep
      * @return $this
      */
-    public function push($data, string $deep = null): static
+    public function deepSet($data, string $deep): static
     {
-        if (!is_null($deep)) {
-            Arr::set($this->resources, $deep, $data);
-        } else {
-            array_push($this->resources, $data);
-        }
+        Arr::set($this->resources, $deep, $data);
 
         return $this;
     }
