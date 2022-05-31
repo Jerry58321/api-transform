@@ -3,9 +3,8 @@
 use Transforms\ExampleTransform;
 use Contracts\TestTransform;
 use PHPUnit\Framework\MockObject\MockBuilder;
-use PHPUnit\Framework\TestCase;
 
-class BaseTest extends TestCase
+abstract class BaseTest extends TestCase
 {
     protected string $transform = ExampleTransform::class;
 
