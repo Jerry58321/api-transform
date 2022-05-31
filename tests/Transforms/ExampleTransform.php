@@ -47,6 +47,7 @@ class ExampleTransform extends Transform implements TestTransform
     {
         return $this->addAdditional()
             ->toTransform()
+            ->packData()
             ->toResponse();
     }
 

@@ -25,8 +25,14 @@ abstract class Transform implements OutputDefinition
     /** @var bool $withPaginationOutput */
     protected bool $withPaginationOutput = true;
 
+    /** @var mixed|\Illuminate\Config\Repository|\Illuminate\Contracts\Foundation\Application  */
+    protected mixed $config;
+
     /** @var string $pack */
-    protected string $pack = 'data';
+    protected string $pack;
+
+    /** @var string VIRTUAL_PACK */
+    private const VIRTUAL_PACK = 'virtual_pack';
 
     /**
      * Transform constructor.
@@ -35,9 +41,11 @@ abstract class Transform implements OutputDefinition
      */
     #[Pure] public function __construct($resources, array $parameters = [])
     {
+        $this->config = config('api-transform');
         $this->resources = new Resources($resources);
         $this->transform = new Resources([]);
         $this->parameters = $parameters;
+        $this->pack = $this->config['pack'];
     }
 
     /**
@@ -50,19 +58,21 @@ abstract class Transform implements OutputDefinition
         return (new static($resources, $parameters))
             ->addAdditional()
             ->toTransform()
+            ->packData()
             ->toResponse();
     }
 
     /**
      * @param $resources
      * @param array $parameters
-     * @return Resources
+     * @return mixed
      */
-    public static function quote($resources, $parameters = []): Resources
+    public static function quote($resources, $parameters = []): mixed
     {
         return (new static($resources, $parameters))
             ->toTransform()
-            ->transform;
+            ->transform
+            ->offsetGet(self::VIRTUAL_PACK);
     }
 
     /**
@@ -104,10 +114,15 @@ abstract class Transform implements OutputDefinition
      */
     protected function addAdditional(): static
     {
-        $this->transform->merge([
-            'code' => 1,
-            'time' => time()
-        ]);
+        $this->transform->merge($this->config['additional']);
+
+        return $this;
+    }
+
+    protected function packData(): static
+    {
+        $this->transform[$this->pack] = $this->transform[self::VIRTUAL_PACK];
+        $this->transform->offsetUnset(self::VIRTUAL_PACK);
 
         return $this;
     }
@@ -144,8 +159,8 @@ abstract class Transform implements OutputDefinition
     private function packOutputKey($key, $data): static
     {
         $key === false ?
-            $this->transform->offsetSet($this->pack, $data) :
-            $this->transform->deepSet($data, "{$this->pack}.{$key}");
+            $this->transform->offsetSet(self::VIRTUAL_PACK, $data) :
+            $this->transform->deepSet($data, self::VIRTUAL_PACK . ".{$key}");
 
         return $this;
     }
@@ -158,14 +173,16 @@ abstract class Transform implements OutputDefinition
      */
     private function packOutputKeyWithPagination($key, $data, AbstractPaginator $paginator): static
     {
-        $this->transform->deepSet($data, "{$this->pack}.{$key}.{$this->pack}");
+        $this->transform->deepSet($data, self::VIRTUAL_PACK . ".{$key}.{$this->pack}");
 
+        $paginationInfo = $this->config['pagination_info'];
+        
         $this->transform->deepSet([
-            'current_page' => $paginator->currentPage(),
-            'last_page'    => $paginator->lastPage(),
-            'per_page'     => $paginator->perPage(),
-            'total'        => $paginator->total()
-        ], "{$this->pack}.{$key}.meta");
+            $paginationInfo['current_page'] => $paginator->currentPage(),
+            $paginationInfo['last_page']    => $paginator->lastPage(),
+            $paginationInfo['per_page']     => $paginator->perPage(),
+            $paginationInfo['total']        => $paginator->total()
+        ], self::VIRTUAL_PACK.".{$key}.{$this->config['pagination_pack']}");
 
         return $this;
     }
