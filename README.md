@@ -4,6 +4,8 @@
 
 `composer require jerry58321/api-transform`
 
+`php artisan vendor:publish --provider="jerry58321\ApiTransform\TransformServiceProvider"`
+
 ## 概念
 
 ---
