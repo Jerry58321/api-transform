@@ -162,16 +162,16 @@ class SuccessDataProvider extends DataProvider
                 ['name' => 'Mike', 'age' => 16],
                 ['name' => 'Max', 'age' => 12]
             ], 3, 2),
-            $secondKey => [
+            $secondKey => new LengthAwarePaginator([
                 ['nickname' => 'J'],
                 ['nickname' => 'M'],
                 ['nickname' => 'M'],
-            ]
+            ], 3, 2)
         ];
 
         return [
             __FUNCTION__ => [
-                [$firstKey => $firstKey, $secondKey => $secondKey],
+                [$firstKey => false, $secondKey => $secondKey],
                 $input,
                 [
                     fn(Transform $transform, Resources $resources) => [
@@ -183,24 +183,27 @@ class SuccessDataProvider extends DataProvider
                     ]
                 ],
                 [
-                    $firstKey => [
-                        'data' => [
-                            ['name' => 'John', 'age' => 20],
-                            ['name' => 'Mike', 'age' => 16],
-                            ['name' => 'Max', 'age' => 12]
-                        ],
-                        'meta' => [
-                            'current_page' => 1,
-                            'last_page'    => 2,
-                            'per_page'     => 2,
-                            'total'        => 3
-                        ]
-                    ],
+
+                    ['name' => 'John', 'age' => 20],
+                    ['name' => 'Mike', 'age' => 16],
+                    ['name' => 'Max', 'age' => 12],
                     $secondKey => [
                         ['nickname' => 'J'],
                         ['nickname' => 'M'],
                         ['nickname' => 'M'],
                     ]
+                ],
+                'meta' => [
+                    'current_page' => 1,
+                    'last_page'    => 2,
+                    'per_page'     => 2,
+                    'total'        => 3,
+                    $secondKey => [
+                        'current_page' => 1,
+                        'last_page'    => 2,
+                        'per_page'     => 2,
+                        'total'        => 3
+                    ],
                 ]
             ]
         ];

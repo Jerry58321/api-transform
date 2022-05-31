@@ -9,12 +9,13 @@ class ResponseTest extends BaseTest
 {
     /**
      * @dataProvider successDataProvider
+     * @param  array  $methodOutputKey
      * @param $resources
-     * @param array $methodOutputKey
-     * @param array $transformData
+     * @param  array  $transformData
      * @param $result
+     * @param  array  $meta
      */
-    public function testSuccess(array $methodOutputKey, $resources, array $transformData, $result)
+    public function testSuccess(array $methodOutputKey, $resources, array $transformData, $result, array $meta = [])
     {
         /** @var TestTransform $transform */
         $transform = new $this->transform($resources);
@@ -23,6 +24,10 @@ class ResponseTest extends BaseTest
         $content = json_decode($transform->mockResponse()->getContent(), true);
 
         $this->assertSame($result, $content['data'] ?? []);
+
+        if (!empty($meta)) {
+            $this->assertSame($meta, $content['meta'] ?? []);
+        }
     }
 
     /**

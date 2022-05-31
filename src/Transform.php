@@ -173,16 +173,16 @@ abstract class Transform implements OutputDefinition
      */
     private function packOutputKeyWithPagination($key, $data, AbstractPaginator $paginator): static
     {
-        $this->transform->deepSet($data, self::VIRTUAL_PACK . ".{$key}.{$this->pack}");
+        $this->transform->deepSet($data, $key === false ? self::VIRTUAL_PACK : self::VIRTUAL_PACK . ".{$key}");
 
         $paginationInfo = $this->config['pagination_info'];
-        
+
         $this->transform->deepSet([
             $paginationInfo['current_page'] => $paginator->currentPage(),
             $paginationInfo['last_page']    => $paginator->lastPage(),
             $paginationInfo['per_page']     => $paginator->perPage(),
             $paginationInfo['total']        => $paginator->total()
-        ], self::VIRTUAL_PACK.".{$key}.{$this->config['pagination_pack']}");
+        ], $key === false ? $this->config['pagination_pack'] : "{$this->config['pagination_pack']}.{$key}");
 
         return $this;
     }
