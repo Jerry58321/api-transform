@@ -31,15 +31,15 @@ class ResponseTest extends BaseTest
     }
 
     /**
-     * @dataProvider failOnlyOneFalseKeyDataProvider
+     * @dataProvider failExceptionDataProvider
      * @param array $methodOutputKey
      * @param $resources
      * @param array $transformData
      * @param $result
      */
-    public function testOnlyOneFalseKey(array $methodOutputKey, $resources, array $transformData, $result)
+    public function testException(array $methodOutputKey, $resources, array $transformData, $result)
     {
-        $this->expectException(OnlyOneFalseKey::class);
+        $this->expectException($result);
 
         /** @var TestTransform $transform */
         $transform = new $this->transform($resources);
@@ -68,9 +68,12 @@ class ResponseTest extends BaseTest
     /**
      * @return array
      */
-    public function failOnlyOneFalseKeyDataProvider(): array
+    public function failExceptionDataProvider(): array
     {
         $provider = new FailDataProvider($this->getTransformKeyNames());
-        return $provider->verifyOnlyOneFalseKey();
+        return array_merge(
+            $provider->verifyOnlyOneFalseKey(),
+            $provider->verifyOnlyOneAbstractPaginator()
+        );
     }
 }
