@@ -6,6 +6,7 @@ namespace jerry58321\ApiTransform;
 use jerry58321\ApiTransform\Contracts\OutputDefinition;
 use jerry58321\ApiTransform\Exceptions\NotFoundSpecifiedResource;
 use jerry58321\ApiTransform\Exceptions\OnlyOneFalseKey;
+use jerry58321\ApiTransform\Exceptions\OnlyOnePaginatorData;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Str;
@@ -141,6 +142,7 @@ abstract class Transform implements OutputDefinition
     protected function toTransform(): static
     {
         $this->checkIsOnlyOneFalseKey();
+        $this->checkIsOnlyOneAbstractPaginator();
 
         $this->eachResource(function (Resources $resources, $data, $key) {
             $this->withPaginationOutput && $resources->get() instanceof AbstractPaginator ?
@@ -234,5 +236,14 @@ abstract class Transform implements OutputDefinition
     {
         $falseKeyCount = collect($this->methodOutputKey())->intersect([false])->count();
         if ($falseKeyCount > 1) throw new OnlyOneFalseKey("methodOutputKey can only have 1 False Key, {$falseKeyCount} are defined");
+    }
+
+    private function checkIsOnlyOneAbstractPaginator(): void
+    {
+        $abstractPaginatorCount = collect($this->resources->get())->filter(function ($data) {
+            return $data instanceof AbstractPaginator;
+        })->count();
+
+        if ($abstractPaginatorCount > 1) throw new OnlyOnePaginatorData("resources can only have 1 AbstractPaginator class, {$abstractPaginatorCount} are defined");
     }
 }

@@ -162,11 +162,11 @@ class SuccessDataProvider extends DataProvider
                 ['name' => 'Mike', 'age' => 16],
                 ['name' => 'Max', 'age' => 12]
             ], 3, 2),
-            $secondKey => new LengthAwarePaginator([
+            $secondKey => [
                 ['nickname' => 'J'],
                 ['nickname' => 'M'],
                 ['nickname' => 'M'],
-            ], 3, 2)
+            ]
         ];
 
         return [
@@ -198,12 +198,6 @@ class SuccessDataProvider extends DataProvider
                     'last_page'    => 2,
                     'per_page'     => 2,
                     'total'        => 3,
-                    $secondKey => [
-                        'current_page' => 1,
-                        'last_page'    => 2,
-                        'per_page'     => 2,
-                        'total'        => 3
-                    ],
                 ]
             ]
         ];
