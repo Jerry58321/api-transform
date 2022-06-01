@@ -41,7 +41,5 @@ class TransformServiceProvider extends ServiceProvider
         $this->commands([
             Commands\TransformMakeCommand::class,
         ]);
-
-        Artisan::call('make:transform ExampleTransform --example');
     }
 }
