@@ -95,8 +95,8 @@ abstract class Transform implements OutputDefinition
      */
     public function whenRelationLoaded(string $relation, \Closure $action): \Closure
     {
-        return fn(Resources $resource, $key) => $resource->offsetSet($key, $this->when(
-            $resource->get()->relationLoaded($relation),
+        return fn(Resources $resource, $key, Resources $originResource) => $resource->offsetSet($key, $this->when(
+            $originResource->get()->relationLoaded($relation),
             $action
         ));
     }
@@ -224,7 +224,7 @@ abstract class Transform implements OutputDefinition
 
             $data = $resource->mapUnit($resource->get(),
                 fn($data) => $this->getMethodNameFunc($methodName, new Resources($data))
-                    ->mapExecClosure()
+                    ->mapExecClosure($resource)
                     ->get()
             );
 
