@@ -69,10 +69,9 @@ class Resources implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @param  Resources $originResource
      * @return $this
      */
-    public function mapExecClosure(Resources $originResource): static
+    public function mapExecClosure(): static
     {
         if (!is_array($this->resources)) return $this;
 
@@ -82,7 +81,7 @@ class Resources implements ArrayAccess, JsonSerializable
             $currentKey = key($this->resources);
             $data = current($this->resources);
 
-            if ($data instanceof \Closure && $data($this, $currentKey, $originResource) === null) {
+            if ($data instanceof \Closure && $data($this, $currentKey) === null) {
                 continue;
             }
             $lastKey = $this->getRefLastKey($this->resources);
