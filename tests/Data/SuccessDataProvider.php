@@ -47,6 +47,34 @@ class SuccessDataProvider extends DataProvider
     /**
      * @return array[]
      */
+    public function verifyObjectResources(): array
+    {
+        $data = json_decode(json_encode([
+            'name' => 'John',
+            'age' => '18'
+        ]));
+
+        [$firstKey] = $this->keyNames;
+        return [
+            __FUNCTION__ => [
+                [$firstKey => $firstKey],
+                [$firstKey => $data],
+                [
+                    fn(Transform $transform, Resources $resources) => [
+                        'name' => $resources->name,
+                        'age' => $resources->age
+                    ],
+                ],
+                [
+                    $firstKey => (array) $data
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
     public function verifyStringResources(): array
     {
         [$firstKey] = $this->keyNames;

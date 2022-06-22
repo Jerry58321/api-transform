@@ -107,6 +107,10 @@ class Resources implements ArrayAccess, JsonSerializable
      */
     public function __get(string $name): mixed
     {
+        if (is_object($this->get())) {
+            return $this->get()->{$name} ?? null;
+        }
+
         return $this->offsetExists($name) ? $this->offsetGet($name) : null;
     }
 }
