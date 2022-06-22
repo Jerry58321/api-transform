@@ -47,6 +47,34 @@ class SuccessDataProvider extends DataProvider
     /**
      * @return array[]
      */
+    public function verifyObjectResources(): array
+    {
+        $data = json_decode(json_encode([
+            'name' => 'John',
+            'age' => '18'
+        ]));
+
+        [$firstKey] = $this->keyNames;
+        return [
+            __FUNCTION__ => [
+                [$firstKey => $firstKey],
+                [$firstKey => $data],
+                [
+                    fn(Transform $transform, Resources $resources) => [
+                        'name' => $resources->name,
+                        'age' => $resources->age
+                    ],
+                ],
+                [
+                    $firstKey => (array) $data
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
     public function verifyStringResources(): array
     {
         [$firstKey] = $this->keyNames;
@@ -198,32 +226,6 @@ class SuccessDataProvider extends DataProvider
                     'last_page'    => 2,
                     'per_page'     => 2,
                     'total'        => 3,
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function verifyWhenRelationLoaded()
-    {
-        $input = ['name' => 'John', 'age' => 19, 'nickname' => 'J'];
-
-        return [
-            __FUNCTION__ => [
-                [],
-                $input,
-                [
-                    fn(Transform $transform, Resources $resources) => [
-                        'name'     => $transform->whenRelationLoaded('user', fn() => $resources->name . '_prefix'),
-                        'age'      => $transform->whenRelationLoaded('none', fn() => $resources->age),
-                        'nickname' => $transform->whenRelationLoaded('user', fn() => $resources->nickname),
-                    ]
-                ],
-                [
-                    'name'     => $input['name'] . '_prefix',
-                    'nickname' => $input['nickname'],
                 ]
             ]
         ];

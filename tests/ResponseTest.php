@@ -57,6 +57,7 @@ class ResponseTest extends BaseTest
 
         return array_merge(
             $provider->verifyOutputSameResources(),
+            $provider->verifyObjectResources(),
             $provider->verifyStringResources(),
             $provider->verifyTwoResources(),
             $provider->verifyFalseOutputKey(),
