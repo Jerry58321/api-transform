@@ -72,6 +72,23 @@ class SuccessDataProvider extends DataProvider
         ];
     }
 
+    public function verifyNullResources(): array
+    {
+        [$firstKey] = $this->keyNames;
+        return [
+            __FUNCTION__ => [
+                [$firstKey => $firstKey],
+                [$firstKey => null],
+                [
+                    fn(Transform $transform, Resources $resources) => $resources
+                ],
+                [
+                    $firstKey => null
+                ]
+            ]
+        ];
+    }
+
     /**
      * @return array[]
      */

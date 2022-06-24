@@ -14,7 +14,7 @@ trait DelegatesToResource
      */
     public function offsetExists($offset): bool
     {
-        return isset($this->resources[$offset]);
+        return array_key_exists($offset, $this->resources);
     }
 
     /**
