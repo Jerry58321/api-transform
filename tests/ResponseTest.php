@@ -4,6 +4,8 @@ use Contracts\TestTransform;
 use Data\SuccessDataProvider;
 use jerry58321\ApiTransform\Exceptions\OnlyOneFalseKey;
 use Data\FailDataProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Transforms\ExampleTransform;
 
 class ResponseTest extends BaseTest
 {
@@ -15,6 +17,7 @@ class ResponseTest extends BaseTest
      * @param $result
      * @param  array  $meta
      */
+    #[DataProvider('successDataProvider')]
     public function testSuccess(array $methodOutputKey, $resources, array $transformData, $result, array $meta = [])
     {
         /** @var TestTransform $transform */
@@ -37,6 +40,7 @@ class ResponseTest extends BaseTest
      * @param array $transformData
      * @param $result
      */
+    #[DataProvider('failExceptionDataProvider')]
     public function testException(array $methodOutputKey, $resources, array $transformData, $result)
     {
         $this->expectException($result);
@@ -51,9 +55,9 @@ class ResponseTest extends BaseTest
     /**
      * @return array
      */
-    public function successDataProvider(): array
+    public static function successDataProvider(): array
     {
-        $provider = new SuccessDataProvider($this->getTransformKeyNames());
+        $provider = new SuccessDataProvider(call_user_func([ExampleTransform::class, 'getKeyNames']));
 
         return array_merge(
             $provider->verifyOutputSameResources(),
@@ -70,9 +74,9 @@ class ResponseTest extends BaseTest
     /**
      * @return array
      */
-    public function failExceptionDataProvider(): array
+    public static function failExceptionDataProvider(): array
     {
-        $provider = new FailDataProvider($this->getTransformKeyNames());
+        $provider = new FailDataProvider(call_user_func([ExampleTransform::class, 'getKeyNames']));
         return array_merge(
             $provider->verifyOnlyOneFalseKey(),
             $provider->verifyOnlyOneAbstractPaginator()

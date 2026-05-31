@@ -16,7 +16,7 @@ another.
 ## Requirements
 
 - PHP 8.1 or later
-- Laravel components 7.x, 8.x, 9.x, or 10.x
+- Laravel components 7.x, 8.x, 9.x, 10.x, 11.x, or 12.x
 
 ## Installation
 
