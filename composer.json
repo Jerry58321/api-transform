@@ -1,7 +1,7 @@
 {
     "name": "jerry58321/api-transform",
-    "description": "is a api transformation layer",
-    "keywords": ["laravel", "api", "transform"],
+    "description": "A Laravel API response transformation layer for reusable model and feature transforms.",
+    "keywords": ["laravel", "api", "transform", "transformer", "response"],
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -22,6 +22,10 @@
         "orchestra/testbench": "^5.0|^6.0|^7.0",
         "phpunit/phpunit": "^9.3",
         "symfony/var-dumper": "^6.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-text"
     },
     "extra": {
         "laravel": {

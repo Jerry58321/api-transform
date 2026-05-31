@@ -1,83 +1,128 @@
-## 安裝方式
+# API Transform
 
----
+API Transform is a Laravel package for building reusable API response
+transformers. It helps keep API output definitions close to the feature or
+model they represent, while allowing transforms to quote and compose one
+another.
 
-`composer require jerry58321/api-transform`
+## Features
 
-`php artisan vendor:publish --provider="jerry58321\ApiTransform\TransformServiceProvider"`
+- Define response schemas with small transform classes.
+- Reuse model transforms inside feature transforms.
+- Return consistent JSON responses from controllers.
+- Support paginated resources and response metadata.
+- Auto-discover the Laravel service provider through Composer.
 
-## 概念
+## Requirements
 
----
+- PHP 8.1 or later
+- Laravel components 7.x, 8.x, 9.x, or 10.x
 
-在 Transforms 路徑下，應該會有2大主要類別，分別為Models、Features。
+## Installation
 
-`Models (Transform)`：定義已存在的Table Schema，可以被Features引用或者作為其它Models類的關聯引用。
+```bash
+composer require jerry58321/api-transform
+```
 
-`Features (Transform)`：為每一個API功能定義回傳的內容，在職責分明、低耦合度的情況下，Features類可以作為其它Features類的引用。
+Publish the package configuration when you need to customize the generated
+paths:
 
-## 使用方法及範例
+```bash
+php artisan vendor:publish --provider="jerry58321\ApiTransform\TransformServiceProvider"
+```
 
-```markdown
-// IndexController.php
+## Concept
 
-...
+Transforms are usually grouped into two categories:
 
-public function index()
+- `Models`: describe existing table or model schemas and can be reused by other
+  transforms.
+- `Features`: describe the response shape of each API feature and can compose
+  model transforms or other feature transforms.
+
+This keeps controller responses explicit while reducing duplicated response
+mapping code.
+
+## Basic Usage
+
+```php
+use App\Models\LoginLog;
+use App\Transforms\Models\LoginLogTransform;
+
+class IndexController
 {
-    /** @var Models/LoginLog $loginLog */
-    $loginLog = LoginLog::with('user')->get();
+    public function index()
+    {
+        $loginLog = LoginLog::with('user')->get();
 
-    return LoginLogTransform::response(compact('loginLog'));
+        return LoginLogTransform::response(compact('loginLog'));
+    }
 }
 ```
 
-```markdown
-// Transforms/Models/UserTransform.php
-
-...
+```php
+use jerry58321\ApiTransform\Resources;
+use jerry58321\ApiTransform\Transform;
 
 class UserTransform extends Transform
 {
     public function methodOutputKey(): array
     {
         return [
-            'user' => false
+            'user' => false,
         ];
     }
 
-    public function __user(Resources $resource)
+    public function __user(Resources $resource): array
     {
         return [
             'account' => $resource->account,
-            'name'    => $resource->name,
+            'name' => $resource->name,
         ];
     }
 }
 ```
 
-```markdown
-// Transforms/Models/LoginLogTransform.php
-
-...
+```php
+use jerry58321\ApiTransform\Resources;
+use jerry58321\ApiTransform\Transform;
 
 class LoginLogTransform extends Transform
 {
     public function methodOutputKey(): array
     {
         return [
-            'loginLog' => 'login_log'
+            'loginLog' => 'login_log',
         ];
     }
 
-    public function __loginLog(Resources $resources)
+    public function __loginLog(Resources $resources): array
     {
         $user = UserTransform::quote(['user' => $resources->user]);
 
         return array_merge($user, [
-            'ip'       => $resources->ip,
-            'login_at' => $resources->login_at
+            'ip' => $resources->ip,
+            'login_at' => $resources->login_at,
         ]);
     }
 }
 ```
+
+## Testing
+
+```bash
+composer install
+composer test
+```
+
+## Maintenance Roadmap
+
+- Keep the package test suite running on supported PHP versions.
+- Review Laravel compatibility as new framework versions are released.
+- Improve examples for common response patterns such as pagination and metadata.
+- Use Codex to assist with issue triage, pull request review, and release
+  preparation.
+
+## License
+
+API Transform is open-sourced software licensed under the MIT license.
