@@ -1,0 +1,46 @@
+name: Bug report
+description: Report incorrect output, compatibility issues, or regressions.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      placeholder: "3.1.0"
+    validations:
+      required: true
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "8.2.0"
+    validations:
+      required: true
+  - type: input
+    id: laravel-version
+    attributes:
+      label: Laravel version
+      placeholder: "11.x"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the transform class, input data, and controller usage when possible.
+      placeholder: "Paste a minimal transform and response payload here."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected output
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual output
+    validations:
+      required: true

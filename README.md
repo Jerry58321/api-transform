@@ -1,5 +1,10 @@
 # API Transform
 
+[![Tests](https://github.com/Jerry58321/api-transform/actions/workflows/tests.yml/badge.svg)](https://github.com/Jerry58321/api-transform/actions/workflows/tests.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/jerry58321/api-transform.svg)](https://packagist.org/packages/jerry58321/api-transform)
+[![Total Downloads](https://img.shields.io/packagist/dt/jerry58321/api-transform.svg)](https://packagist.org/packages/jerry58321/api-transform)
+[![License](https://img.shields.io/packagist/l/jerry58321/api-transform.svg)](LICENSE)
+
 API Transform is a Laravel package for building reusable API response
 transformers. It helps keep API output definitions close to the feature or
 model they represent, while allowing transforms to quote and compose one
@@ -114,6 +119,29 @@ class LoginLogTransform extends Transform
 composer install
 composer test
 ```
+
+## Version Support
+
+The current release line supports PHP 8.1+ and Laravel components 7.x through
+12.x. Compatibility is tested against the maintained Laravel generations in
+GitHub Actions.
+
+## Security
+
+If you discover a security issue, please do not open a public issue with
+exploit details. Email the maintainer or open a minimal GitHub issue asking for
+a private coordination channel. See [SECURITY.md](SECURITY.md) for the current
+support policy.
+
+## Contributing
+
+Issues, compatibility reports, documentation fixes, and pull requests are
+welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the local setup and pull
+request checklist.
+
+## Changelog
+
+Release notes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## Maintenance Roadmap
 
